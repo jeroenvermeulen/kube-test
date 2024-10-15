@@ -1,0 +1,64 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: test-echoip-ingress
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: echoip-deployment
+  namespace: test-echoip-ingress
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: echoip-app
+  template:
+    metadata:
+      labels:
+        app: echoip-app
+    spec:
+      containers:
+      - name: echoip-container
+        image: mpolden/echoip
+        args:
+        - "-p"
+        - "-r"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: echoip-service
+  namespace: test-echoip-ingress
+spec:
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+  selector:
+    app: echoip-app
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: echoip-ingress
+  namespace: test-echoip-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  tls:
+  - hosts:
+    - echoip.testdomain.dev
+    secretName: echoip-nl1-k8s-tls
+  rules:
+  - host: echoip.testdomain.dev
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: echoip-service
+            port:
+              number: 80

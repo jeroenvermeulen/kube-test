@@ -1,0 +1,38 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: test-helloworld-lb
+---
+kind: Pod
+apiVersion: v1
+metadata:
+  name: hello-world
+  namespace: test-helloworld-lb
+  labels:
+    app: helloworld
+spec:
+  containers:
+    - name: helloworld
+      image: karthequian/helloworld:latest
+      ports:
+      - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: helloworld
+  namespace: test-helloworld-lb
+spec:
+  selector:
+    app: helloworld
+  type: LoadBalancer
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+
+### Test:
+#  kubectl  apply  -f  hello-world-lb.yaml
+#  kubectl  get  -n test-helloworld-lb  service   # After a while should have an "ExternalIP" which you can visit in your browser using HTTP.
+#  kubectl  delete  namespaces  test-helloworld-lb

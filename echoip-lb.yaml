@@ -1,0 +1,41 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: test-echoip-lb
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: echoip-deployment
+  namespace: test-echoip-lb
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: echoip-app
+  template:
+    metadata:
+      labels:
+        app: echoip-app
+    spec:
+      containers:
+      - name: echoip-container
+        image: mpolden/echoip
+        args:
+        - "-p"
+        - "-r"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: echoip-service
+  namespace: test-echoip-lb
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+  selector:
+    app: echoip-app

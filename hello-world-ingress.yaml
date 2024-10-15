@@ -1,0 +1,72 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: poc-helloworld-ing
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: helloworld
+  namespace: poc-helloworld-ing
+spec:
+  selector:
+    matchLabels:
+      app: helloworld
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: helloworld
+    spec:
+      containers:
+      - name: helloworld
+        image: karthequian/helloworld:latest
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: helloworld
+  namespace: poc-helloworld-ing
+spec:
+  selector:
+    app: helloworld
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: helloworld
+  namespace: poc-helloworld-ing
+  annotations:
+    cert-manager.io/cluster-issuer: pw-letsencrypt
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: poc.vermeulen.prowise.io
+      http:
+        paths:
+          - pathType: Prefix
+            backend:
+              service:
+                name: helloworld
+                port:
+                  number: 80
+            path: /
+  tls:
+    - hosts:
+        - poc.vermeulen.prowise.io
+      secretName: poc-hello-world-tls
+
+### Test:
+#  kubectl  apply  -f  hello-world-ingress.yaml
+#  kubectl  get  -n poc-helloworld-ing  ingress   # After a while you should see an "Address" which you can visit in your browser.
+#  curl  --header "Host: poc.prowise.deovero.net"  http://20.101.223.113
+#  kubectl  get  -n poc-helloworld-ing  certificate
+#  curl  https://poc.prowise.deovero.net
+#  kubectl  delete  namespaces  poc-helloworld-ing

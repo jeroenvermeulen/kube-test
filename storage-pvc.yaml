@@ -23,7 +23,7 @@ metadata:
   namespace: test-storage-pvc
 spec:
   volumes:
-    - name: storage-vol
+    - name: storage-volume
       persistentVolumeClaim:
         claimName: storage-pvc
   containers:
@@ -33,6 +33,6 @@ spec:
       args: [ "while true; do sleep 30; done;" ]
       volumeMounts:
         - mountPath: /volume
-          name: storage-vol
+          name: storage-volume
 
 #  kubectl exec  -n test-storage-pvc  ubuntu-pod  -it  --  bash

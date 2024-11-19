@@ -7,3 +7,5 @@ spec:
   containers:
     - name: ubuntu-with-tools
       image: jcmvermeulen/ubuntu-with-tools:latest
+
+# Pod shell:   kubectl exec  -n default  ubuntu-with-tools  -it  --  bash

@@ -48,7 +48,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: poc.vermeulen.prowise.io
+    - host: poc-hello-world.com
       http:
         paths:
           - pathType: Prefix
@@ -60,13 +60,13 @@ spec:
             path: /
   tls:
     - hosts:
-        - poc.vermeulen.prowise.io
+        - poc-hello-world.com
       secretName: poc-hello-world-tls
 
 ### Test:
 #  kubectl  apply  -f  hello-world-ingress.yaml
 #  kubectl  get  -n poc-helloworld-ing  ingress   # After a while you should see an "Address" which you can visit in your browser.
-#  curl  --header "Host: poc.prowise.deovero.net"  http://20.101.223.113
+#  curl  --header "Host: poc-hello-world.com"  http://11.22.33.44
 #  kubectl  get  -n poc-helloworld-ing  certificate
-#  curl  https://poc.prowise.deovero.net
+#  curl  https://poc-hello-world.com
 #  kubectl  delete  namespaces  poc-helloworld-ing
